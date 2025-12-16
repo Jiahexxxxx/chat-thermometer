@@ -1,101 +1,796 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>聊天溫度計（免費完整版）</title>
-
-<style>
-body{
-  font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC",sans-serif;
-  background:#0f172a;color:#e5e7eb;margin:0;display:flex;justify-content:center;padding:20px
-}
-.card{
-  width:100%;max-width:650px;background:#020617;border-radius:16px;padding:18px;
-  border:1px solid rgba(255,255,255,.08);box-shadow:0 20px 40px rgba(0,0,0,.45)
-}
-h1{text-align:center;margin:0 0 6px}
-.sub{text-align:center;font-size:13px;opacity:.8;margin-bottom:12px}
-input,textarea,select{
-  width:100%;border-radius:12px;border:1px solid rgba(255,255,255,.1);
-  background:#0b1220;color:#e5e7eb;padding:10px
-}
-textarea{height:140px}
-button{
-  width:100%;margin-top:10px;padding:12px;border-radius:999px;
-  background:#38bdf8;color:#062235;font-weight:900;border:none
-}
-button:disabled{opacity:.5}
-.status,.hint{
-  margin-top:10px;font-size:13px;line-height:1.5;opacity:.85
-}
-.preview img{width:100%;border-radius:10px}
-.timeBtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.timeBtn{
-  padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.15);
-  background:#0b1220;color:#e5e7eb;font-weight:800
-}
-.timeBtn.picked{background:#34d399;color:#022c22}
-canvas{width:100%;margin-top:10px;background:#0b1220;border-radius:12px}
-.danger{background:#fb7185;color:#2a0b12}
-.ghost{background:#0b1220;color:#e5e7eb;border:1px solid rgba(255,255,255,.15)}
-.divider{height:1px;background:rgba(255,255,255,.08);margin:14px 0}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>聊天溫度計（免費完整版）</title>
+  <style>
+    :root{
+      --bg:#0f172a; --card:#020617; --text:#e5e7eb; --muted:rgba(229,231,235,.78);
+      --line:rgba(255,255,255,.10); --box:#0b1220; --btn:#38bdf8; --btnText:#062235;
+      --ok:#34d399; --danger:#fb7185;
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0; min-height:100vh; background:var(--bg); color:var(--text);
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+      display:flex; justify-content:center; padding:22px 14px;
+    }
+    .card{
+      width:100%; max-width:680px; background:var(--card); border-radius:16px; padding:18px;
+      border:1px solid var(--line); box-shadow:0 20px 40px rgba(0,0,0,.45);
+    }
+    h1{margin:0 0 6px; text-align:center; font-size:20px;}
+    .sub{margin:0 0 12px; text-align:center; color:var(--muted); font-size:13px; line-height:1.45;}
+    .row{margin-top:10px;}
+    input[type="file"], textarea, select{
+      width:100%; border-radius:12px; border:1px solid var(--line);
+      background:var(--box); color:var(--text);
+    }
+    input[type="file"]{padding:10px;}
+    textarea{height:150px; padding:10px; resize:none; outline:none; font-size:14px; line-height:1.4;}
+    select{padding:10px;}
+    .tiny{font-size:12px; color:var(--muted); line-height:1.45; margin-top:6px;}
+    .preview{
+      margin-top:10px; padding:10px; border-radius:12px; border:1px solid var(--line); background:var(--box);
+      display:none;
+    }
+    .preview img{width:100%; border-radius:10px; display:block;}
+    .divider{height:1px; background:rgba(255,255,255,.08); margin:14px 0;}
+    button{
+      width:100%; margin-top:10px; padding:12px 14px; border:none; border-radius:999px;
+      background:var(--btn); color:var(--btnText); font-weight:900; font-size:16px; cursor:pointer;
+    }
+    button:disabled{opacity:.55; cursor:not-allowed;}
+    .ghostBtn{
+      background:transparent; color:var(--text); border:1px solid var(--line);
+      font-weight:800; font-size:14px;
+    }
+    .dangerBtn{ background:var(--danger); color:#1b0b10; }
+    .status{
+      margin-top:10px; padding:10px; border-radius:12px;
+      background:rgba(56,189,248,.10); border:1px solid rgba(56,189,248,.25);
+      font-size:13px; line-height:1.5;
+    }
+    .result{
+      margin-top:12px; text-align:center; font-size:18px; font-weight:900; min-height:28px;
+    }
+    .hint{
+      margin-top:10px; color:var(--muted); font-size:12px; line-height:1.55; white-space:pre-wrap;
+    }
+    .timeWrap{
+      margin-top:10px; padding:12px; border-radius:12px; background:var(--box); border:1px solid var(--line);
+    }
+    .timeBtns{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;}
+    .timeBtn{
+      padding:10px 12px; border-radius:999px; border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.03); color:var(--text); font-weight:800; font-size:14px; cursor:pointer;
+    }
+    .timeBtn.picked{background:var(--ok); color:#022c22; border-color:rgba(52,211,153,.65);}
+    canvas{
+      width:100%; height:auto; margin-top:10px; border-radius:12px; border:1px solid var(--line); background:var(--box);
+    }
+  </style>
 </head>
-
 <body>
-<div class="card">
-<h1>聊天溫度計</h1>
-<div class="sub">多張截圖｜OCR｜累積對話｜強制標註她回你多久</div>
+  <div class="card">
+    <h1>聊天溫度計（免費完整版）</h1>
+    <div class="sub">
+      ✅ 多張截圖 OCR 讀字｜✅ 無限累積（存在本機）｜✅ 系統自動推定回覆時間<br>
+      ✅ 直接教你怎麼回（可複製）｜（可選）點兩個時間修正：你發 → 她回
+    </div>
 
-<input type="file" id="image" accept="image/*" multiple>
-<div class="preview"><img id="preview"></div>
+    <div class="row">
+      <input id="image" type="file" accept="image/*" multiple />
+      <div class="tiny">建議：用聊天截圖、裁切只留對話區、字越清楚越準。</div>
+    </div>
 
-<textarea id="chat" placeholder="（可選）補充或修改對話文字"></textarea>
+    <div class="preview" id="previewWrap">
+      <img id="preview" alt="預覽圖片" />
+    </div>
 
-<div class="divider"></div>
+    <div class="row">
+      <div class="tiny">（可選）你也可以在這裡補充 / 修正文字（會加到累積對話最後面）：</div>
+      <textarea id="chat" placeholder="貼上文字或補充：例如『她回很慢還要聊嗎』"></textarea>
+    </div>
 
-<div class="status" id="history"></div>
-<button id="clear" class="danger">清除全部紀錄</button>
-<button id="export" class="ghost">下載紀錄</button>
+    <div class="divider"></div>
 
-<div class="divider"></div>
+    <div class="row">
+      <div class="tiny">📚 本機累積紀錄</div>
+      <div class="status" id="historyBox" style="display:block"></div>
+      <button id="clearBtn" class="dangerBtn" type="button">清除本機對話與回覆紀錄</button>
+      <button id="exportBtn" class="ghostBtn" type="button">下載紀錄（JSON）</button>
+    </div>
 
-<select id="mode">
-<option value="auto">自動</option>
-<option value="line">LINE</option>
-<option value="ig">IG</option>
-</select>
+    <div class="divider"></div>
 
-<div class="status" id="timeGuide">請上傳截圖</div>
-<div class="timeBtns" id="timeBtns"></div>
-<button id="undo" class="ghost">撤銷點錯</button>
-<button id="undoRec" class="ghost">刪除最後一次</button>
+    <div class="row">
+      <div class="tiny">⏱️ 回覆時間（系統自動推定；你覺得不準再手動修正）</div>
+      <div class="timeWrap">
+        <div class="tiny" style="margin-bottom:6px;">
+          來源：
+          <select id="appMode" style="width:auto;display:inline-block;">
+            <option value="auto">自動（建議）</option>
+            <option value="line">LINE</option>
+            <option value="ig">IG</option>
+          </select>
+        </div>
 
-<button id="analyze" disabled>開始分析</button>
+        <div id="timeGuide" class="tiny">上傳截圖並 OCR 完成後，系統會自動推定回覆時間；也會顯示時間按鈕供你修正。</div>
+        <div id="timePicker" class="timeBtns"></div>
 
-<div class="status" id="result"></div>
-<div class="hint" id="advice"></div>
+        <button id="undoPickBtn" class="ghostBtn" type="button">撤銷上一步（點錯時間）</button>
+        <button id="undoRecordBtn" class="ghostBtn" type="button">刪除最後一次回覆紀錄</button>
 
-<canvas id="chart" height="180"></canvas>
-</div>
+        <div class="hint" id="timeStats"></div>
+        <canvas id="trendChart" width="620" height="190"></canvas>
+      </div>
+    </div>
 
-<script src="https://unpkg.com/tesseract.js@5/dist/tesseract.min.js"></script>
-<script>
-// ⚠️ 這裡是完整 JS（已整合你要的全部功能）
-// 由於篇幅非常長，實際已完整整合：
-// - OCR
-// - 多圖
-// - 累積
-// - 強制時間點選
-// - 她回你多久
-// - 撤銷
-// - 趨勢圖
-// - 本機儲存
+    <button id="analyzeBtn" type="button">開始分析（不用標註也能用）</button>
 
-// 👉 你只需要「直接用」，不需要再改
-alert("整合版已載入，請上傳聊天截圖測試");
-</script>
+    <div class="status" id="statusBox" style="display:none"></div>
+    <div class="result" id="result"></div>
+    <div class="hint" id="hint"></div>
 
+    <div class="divider"></div>
+
+    <div class="status" id="replyCoach" style="display:none"></div>
+    <button id="copyBtn" class="ghostBtn" type="button" style="display:none">一鍵複製建議</button>
+  </div>
+
+  <script src="https://unpkg.com/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script>
+    // ===== DOM =====
+    const elImage = document.getElementById('image');
+    const elPreviewWrap = document.getElementById('previewWrap');
+    const elPreview = document.getElementById('preview');
+    const elChat = document.getElementById('chat');
+    const elAnalyzeBtn = document.getElementById('analyzeBtn');
+    const elStatusBox = document.getElementById('statusBox');
+    const elResult = document.getElementById('result');
+    const elHint = document.getElementById('hint');
+    const elHistoryBox = document.getElementById('historyBox');
+
+    const elAppMode = document.getElementById('appMode');
+    const elTimeGuide = document.getElementById('timeGuide');
+    const elTimePicker = document.getElementById('timePicker');
+    const elTimeStats = document.getElementById('timeStats');
+
+    const elReplyCoach = document.getElementById('replyCoach');
+    const elCopyBtn = document.getElementById('copyBtn');
+
+    // ===== Storage =====
+    const STORE_CHAT_KEY  = "chat_history_v3";
+    const STORE_REPLY_KEY = "her_reply_times_v3";
+
+    // ===== State =====
+    let pendingTimes = [];            // 最新截圖抓到的時間（去噪後）
+    let picked = [];                  // 手動點選：你發/她回
+    let latestHerReplyMinutes = null; // 手動修正值（有就覆蓋自動）
+
+    // ===== Helpers =====
+    function setStatus(msg){
+      elStatusBox.style.display = 'block';
+      elStatusBox.textContent = msg;
+    }
+    function clearStatus(){
+      elStatusBox.style.display = 'none';
+      elStatusBox.textContent = "";
+    }
+    function loadJSON(key, fallback){
+      try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
+      catch { return fallback; }
+    }
+    function saveJSON(key, val){
+      localStorage.setItem(key, JSON.stringify(val));
+    }
+    function loadChatHistory(){ return loadJSON(STORE_CHAT_KEY, []); }
+    function saveChatHistory(items){ saveJSON(STORE_CHAT_KEY, items); }
+    function appendChatHistory(item){
+      const items = loadChatHistory();
+      items.push(item);
+      saveChatHistory(items);
+      return items;
+    }
+    function loadReplyHistory(){ return loadJSON(STORE_REPLY_KEY, []); }
+    function saveReplyHistory(items){ saveJSON(STORE_REPLY_KEY, items); }
+    function appendReplyHistory(item){
+      const items = loadReplyHistory();
+      items.push(item);
+      saveReplyHistory(items);
+      return items;
+    }
+
+    function renderHistory(){
+      const items = loadChatHistory();
+      const replies = loadReplyHistory();
+
+      if(!items.length){
+        elHistoryBox.innerHTML = "目前沒有對話紀錄。上傳截圖後，我會把每次 OCR 的文字存在本機。";
+      } else {
+        const last = items[items.length-1];
+        elHistoryBox.innerHTML =
+          `已累積對話：<b>${items.length}</b> 次<br>` +
+          `最近一次：${new Date(last.ts).toLocaleString()}<br>` +
+          `最近摘要：<br><span style="opacity:.92;white-space:pre-wrap">${(last.text||"").slice(0,180)}</span>`;
+      }
+
+      if(replies.length){
+        elTimeStats.textContent = buildReplyStatsText(replies);
+      } else {
+        if(!elTimeStats.textContent) elTimeStats.textContent = "";
+      }
+    }
+
+    // iPhone 省記憶體：縮圖
+    async function downscaleToDataURL(file, maxSide=1400, quality=0.88){
+      const img = new Image();
+      const dataUrl = await new Promise((res, rej) => {
+        const reader = new FileReader();
+        reader.onload = () => res(reader.result);
+        reader.onerror = rej;
+        reader.readAsDataURL(file);
+      });
+      await new Promise((res, rej) => {
+        img.onload = res; img.onerror = rej; img.src = dataUrl;
+      });
+
+      const w = img.naturalWidth, h = img.naturalHeight;
+      const scale = Math.min(1, maxSide / Math.max(w, h));
+      const cw = Math.max(1, Math.round(w * scale));
+      const ch = Math.max(1, Math.round(h * scale));
+
+      const canvas = document.createElement('canvas');
+      canvas.width = cw; canvas.height = ch;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, cw, ch);
+      return canvas.toDataURL('image/jpeg', quality);
+    }
+
+    // OCR：繁中
+    async function runOCR(imageDataUrl){
+      const worker = await Tesseract.createWorker('chi_tra', 1, {
+        logger: m => {
+          if (m.status && typeof m.progress === 'number') {
+            const p = Math.round(m.progress * 100);
+            setStatus(`🔍 OCR 讀圖中… ${m.status}（${p}%）`);
+          }
+        }
+      });
+      try{
+        await worker.setParameters({ tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK });
+        const { data } = await worker.recognize(imageDataUrl);
+        return (data.text || "")
+          .replace(/[ \t]+\n/g, "\n")
+          .replace(/\n{3,}/g, "\n\n")
+          .trim();
+      } finally {
+        await worker.terminate();
+      }
+    }
+
+    // ===== Time parsing / filtering =====
+    function extractTimesHHMM(text){
+      // 支援 9:05 / 09:05 / 9：05（全形冒號）
+      const re = /\b([01]?\d|2[0-3])[：:]\s*([0-5]\d)\b/g;
+      const out = [];
+      const seen = new Set();
+      let m;
+      while((m = re.exec(text)) !== null){
+        const t = `${m[1]}:${m[2]}`; // 統一成半形
+        if(!seen.has(t)){ seen.add(t); out.push(t); }
+      }
+      return out;
+    }
+
+    function toMinutes(hhmm){
+      const [h,m] = hhmm.split(":").map(Number);
+      return h*60+m;
+    }
+    function diffMinutes(a, b){
+      let d = b-a;
+      if(d < 0) d += 1440;
+      return d;
+    }
+
+    function filterTimesByMode(times, mode){
+      let out = times.slice();
+
+      // 去掉「太密集」噪音：相鄰差太小
+      const minGap = (mode === "ig") ? 2 : 1; // IG 稍嚴格
+      const keep = [];
+      for(const t of out){
+        if(!keep.length){ keep.push(t); continue; }
+        const d = diffMinutes(toMinutes(keep[keep.length-1]), toMinutes(t));
+        if(d >= minGap) keep.push(t);
+      }
+      out = keep;
+
+      // IG 再多一道：去掉跨度超長（通常不是同段對話）
+      if(mode === "ig"){
+        const igKeep = [];
+        for(const t of out){
+          if(!igKeep.length){ igKeep.push(t); continue; }
+          const d = diffMinutes(toMinutes(igKeep[igKeep.length-1]), toMinutes(t));
+          if(d <= 600) igKeep.push(t); // 10 小時內
+        }
+        if(igKeep.length >= 2) out = igKeep;
+      }
+
+      // auto：按數量調整
+      if(mode === "auto" && out.length >= 10){
+        const autoKeep = [];
+        for(const t of out){
+          if(!autoKeep.length){ autoKeep.push(t); continue; }
+          const d = diffMinutes(toMinutes(autoKeep[autoKeep.length-1]), toMinutes(t));
+          if(d >= 2 && d <= 600) autoKeep.push(t);
+        }
+        if(autoKeep.length >= 2) out = autoKeep;
+      }
+      return out;
+    }
+
+    // 自動推定「她回你多久」（保守，不裝神）
+    function autoEstimateReplyMinutes(times){
+      if(!times || times.length < 2) return null;
+
+      const mins = times.map(toMinutes);
+      const diffs = [];
+      for(let i=0;i<mins.length-1;i++){
+        let d = diffMinutes(mins[i], mins[i+1]);
+        // 排除太近/太遠：太近多為連發或噪音；太遠可能隔天/不同段
+        if(d >= 2 && d <= 480) diffs.push(d);
+      }
+      if(!diffs.length) return null;
+
+      diffs.sort((a,b)=>a-b);
+      const mid = diffs.length % 2
+        ? diffs[(diffs.length-1)/2]
+        : (diffs[diffs.length/2-1] + diffs[diffs.length/2]) / 2;
+      return Math.round(mid);
+    }
+
+    // ===== Time picker (optional manual override) =====
+    function resetPick(){
+      picked = [];
+      latestHerReplyMinutes = null; // 手動值清掉（讓它回到自動）
+      elTimePicker.querySelectorAll(".timeBtn").forEach(b => b.classList.remove("picked"));
+      elTimeGuide.textContent = "（選填）你覺得不準再點：①你發的時間 → ②她回你的時間（會覆蓋自動推定）";
+    }
+
+    function renderTimePicker(times){
+      elTimePicker.innerHTML = "";
+      if(times.length < 2){
+        elTimeGuide.textContent = "⚠️ 這張截圖抓不到足夠時間（少於 2 個）。系統會用文字內容判斷；若要回覆時間，請截到有顯示時間。";
+        pendingTimes = [];
+        return;
+      }
+      elTimeGuide.textContent = "系統已自動推定回覆時間；若覺得不準，可點：①你發 → ②她回（覆蓋自動）";
+      for(const t of times){
+        const b = document.createElement("button");
+        b.type="button";
+        b.className="timeBtn";
+        b.textContent=t;
+        b.dataset.t=t;
+        b.addEventListener("click", () => onPickTime(b));
+        elTimePicker.appendChild(b);
+      }
+      // 不強制，所以不鎖任何東西；只重置提示
+      picked = [];
+    }
+
+    function onPickTime(btn){
+      const t = btn.dataset.t;
+      if(picked.length >= 2) return;
+
+      picked.push(t);
+      btn.classList.add("picked");
+
+      if(picked.length === 1){
+        elTimeGuide.textContent = `已選 ① 你發：${picked[0]}，再點 ② 她回你的時間`;
+        return;
+      }
+
+      if(picked.length === 2){
+        const myT = picked[0], herT = picked[1];
+        const d = diffMinutes(toMinutes(myT), toMinutes(herT));
+        latestHerReplyMinutes = d;
+
+        const arr = appendReplyHistory({ ts: Date.now(), myTime: myT, herTime: herT, diff: d });
+        elTimeStats.textContent = buildReplyStatsText(arr);
+        renderTrendChart();
+
+        elTimeGuide.textContent = `✅ 已手動修正：她這次回你 ${d} 分鐘（已記錄）`;
+      }
+    }
+
+    // 撤銷點選（只撤銷本次）
+    document.getElementById("undoPickBtn").addEventListener("click", () => {
+      if(!picked.length) return;
+      const last = picked.pop();
+
+      // 取消一個 picked 樣式（找最末一個符合且 picked 的）
+      const btns = [...elTimePicker.querySelectorAll(".timeBtn")].filter(b => b.dataset.t === last && b.classList.contains("picked"));
+      if(btns.length) btns[btns.length-1].classList.remove("picked");
+
+      // 只要不是完整兩點，就視為尚未手動覆蓋（回到自動）
+      latestHerReplyMinutes = null;
+
+      if(picked.length === 0) elTimeGuide.textContent = "（選填）你覺得不準再點：①你發的時間 → ②她回你的時間（會覆蓋自動推定）";
+      if(picked.length === 1) elTimeGuide.textContent = `已選 ① 你發：${picked[0]}，再點 ② 她回你的時間`;
+    });
+
+    // 刪除最後一次回覆紀錄（會影響統計/圖）
+    document.getElementById("undoRecordBtn").addEventListener("click", () => {
+      const arr = loadReplyHistory();
+      if(!arr.length) return;
+      arr.pop();
+      saveReplyHistory(arr);
+
+      elTimeStats.textContent = arr.length ? buildReplyStatsText(arr) : "";
+      renderTrendChart();
+
+      elTimeGuide.textContent = "已刪除最後一次回覆紀錄。";
+    });
+
+    function buildReplyStatsText(arr){
+      const diffs = arr.map(x=>x.diff).slice().sort((a,b)=>a-b);
+      const sum = diffs.reduce((s,x)=>s+x,0);
+      const avg = sum / diffs.length;
+      const median = diffs.length % 2
+        ? diffs[(diffs.length-1)/2]
+        : (diffs[diffs.length/2-1] + diffs[diffs.length/2]) / 2;
+      const min = diffs[0], max = diffs[diffs.length-1];
+
+      let trend = "";
+      if(arr.length >= 3){
+        const last3 = arr.slice(-3).map(x=>x.diff);
+        const first = last3[0], last = last3[2];
+        if(last - first >= 10) trend = "（最近變慢）";
+        else if(first - last >= 10) trend = "（最近變快）";
+        else trend = "（最近差不多）";
+      }
+
+      return `⏱️ 她回覆統計（累積 ${arr.length} 次）
+最新：${arr[arr.length-1].diff} 分
+平均：${avg.toFixed(1)} 分｜中位數：${median} 分｜最短：${min} 分｜最長：${max} 分 ${trend}`;
+    }
+
+    // 趨勢圖（最近 7 次）
+    function renderTrendChart(){
+      const canvas = document.getElementById("trendChart");
+      const ctx = canvas.getContext("2d");
+      const arr = loadReplyHistory();
+      const lastN = arr.slice(-7);
+      const data = lastN.map(x=>x.diff);
+
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      if(!data.length){
+        ctx.fillStyle = "rgba(229,231,235,.75)";
+        ctx.font = "14px system-ui";
+        ctx.fillText("趨勢圖：尚無資料（先上傳截圖或手動修正一次）", 14, 28);
+        return;
+      }
+
+      const padL=42, padR=12, padT=18, padB=28;
+      const W=canvas.width, H=canvas.height;
+      const innerW=W-padL-padR, innerH=H-padT-padB;
+
+      const maxV=Math.max(...data), minV=Math.min(...data);
+      const span=Math.max(1, maxV-minV);
+
+      // axes
+      ctx.strokeStyle="rgba(255,255,255,.18)";
+      ctx.beginPath();
+      ctx.moveTo(padL,padT);
+      ctx.lineTo(padL,H-padB);
+      ctx.lineTo(W-padR,H-padB);
+      ctx.stroke();
+
+      // labels
+      ctx.fillStyle="rgba(229,231,235,.75)";
+      ctx.font="12px system-ui";
+      ctx.fillText(String(maxV), 8, padT+10);
+      ctx.fillText(String(minV), 8, H-padB);
+
+      // points
+      const pts=data.map((v,i)=>{
+        const x=padL+(data.length===1?innerW/2:(innerW*i/(data.length-1)));
+        const y=padT+(innerH*(1-(v-minV)/span));
+        return {x,y,v};
+      });
+
+      // line
+      ctx.strokeStyle="rgba(56,189,248,.95)";
+      ctx.lineWidth=2;
+      ctx.beginPath();
+      pts.forEach((p,i)=>{ if(i===0) ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y); });
+      ctx.stroke();
+
+      // dots
+      ctx.fillStyle="rgba(52,211,153,.95)";
+      pts.forEach(p=>{
+        ctx.beginPath(); ctx.arc(p.x,p.y,3.5,0,Math.PI*2); ctx.fill();
+      });
+
+      // title
+      ctx.fillStyle="rgba(229,231,235,.85)";
+      ctx.font="13px system-ui";
+      ctx.fillText("最近 7 次：她回你多久（分鐘）", padL, 14);
+    }
+
+    // ===== Reply Coach =====
+    function buildReplyCoach(label, replyMin){
+      const slow = (typeof replyMin === "number" && replyMin >= 120);
+      const verySlow = (typeof replyMin === "number" && replyMin >= 360);
+      const opener = "欸我剛想到你上次說的那個😂";
+
+      let title = "📌 你可以這樣回（選一個直接貼）";
+      let lines = [];
+      let stoploss = "止損線：你丟球 2 次都沒接（只回嗯/好/喔或不延伸），就停 3 天。";
+
+      if (label.includes("很熱") || label.includes("🔥")) {
+        lines = [
+          `${opener} 你今天什麼時候比較有空？我想約你喝個飲料～`,
+          `我發現跟你聊天蠻舒服的😂 這週找一天出來走走？`,
+          `那我先去忙一下～晚點再找你（順便想約你）`
+        ];
+        stoploss = "加速法：直接丟日期選項：週五或週日哪天比較可以？";
+      } else if (label.includes("曖昧") || label.includes("🌤️")) {
+        lines = [
+          `${opener} 這週你哪天比較有空？我想請你喝個飲料/吃小東西～`,
+          `你剛剛那句很好笑😂 之後想聽你多講一點～（順便約你）`,
+          `我先去忙～你方便再回就好🙂`
+        ];
+        if (slow) lines.unshift(`你忙沒關係～你方便再回我就好🙂（我不急）`);
+      } else if (label.includes("偏冷") || label.includes("🧊")) {
+        lines = [
+          `好～那你先忙🙂（我先去忙我的，晚點再說）`,
+          `我想確認一下：你比較喜歡我怎麼跟你聊？（輕鬆聊天/有空再聊都行）`,
+          `這週你如果有空我們喝個飲料就好，不方便也沒關係～`
+        ];
+        stoploss = "止損線：一次邀約＋一次收尾後，3 天內沒推進（不給時間/不延伸/不主動），就先停止主動。";
+        if (verySlow) title = "📌 你可以這樣回（先收手、保護自己）";
+      } else {
+        lines = [
+          `${opener} 你現在方便回嗎？`,
+          `你今天過得怎樣？我剛忙完～`,
+          `我先去忙～你有空再回就好🙂`
+        ];
+      }
+
+      // 確保至少 3 句
+      while(lines.length < 3) lines.push(lines[lines.length-1] || "我先去忙～你有空再回就好🙂");
+
+      return { title, lines: lines.slice(0,3), stoploss };
+    }
+
+    // ===== Core analysis =====
+    function analyzeText(allText, replyMin){
+      let score = 0;
+      const t = allText || "";
+
+      const HOT  = ["想你","想見你","我想你","抱抱","親親","愛你","喜歡你","寶","寶貝","❤️","😘","😍","晚安❤️","想你了"];
+      const WARM = ["哈哈","笑死","欸","在嗎","你在幹嘛","幹嘛","可以啊","好呀","OK","行","晚安","早安","吃飯","出去","下次","改天"];
+      const COLD = ["嗯","喔","哦","好","隨便","不知道","再說","忙","先這樣","掰","呵","已讀","已讀不回","回很慢","敷衍","不回","都我主動"];
+
+      HOT.forEach(w => { if(t.includes(w)) score += 2; });
+      WARM.forEach(w => { if(t.includes(w)) score += 1; });
+      COLD.forEach(w => { if(t.includes(w)) score -= 1; });
+
+      if (t.replace(/\s/g,"").length <= 2) score -= 1;
+      ["已讀不回","回很慢","都我主動"].forEach(w => { if(t.includes(w)) score -= 2; });
+
+      // 回覆時間加權（自動推定或手動覆蓋）
+      if(typeof replyMin === "number"){
+        if(replyMin <= 10) score += 3;
+        else if(replyMin <= 30) score += 2;
+        else if(replyMin <= 60) score += 1;
+        else if(replyMin <= 180) score -= 1;
+        else score -= 2;
+      }
+
+      let label = "😐 普通";
+      let advice = "建議：用一次輕量邀約測她會不會把時間給你（比一直聊天更準）。";
+
+      if(score >= 6){
+        label = "🔥 很熱";
+        advice = "趁熱把邀約落地：給『時間 + 地點 + 一個選項』，不要連發追問。";
+      } else if(score >= 3){
+        label = "🌤️ 曖昧";
+        advice = "維持節奏：短句、有收尾；用一次邀約測她願不願意把互動推到現實。";
+      } else if(score <= 0){
+        label = "🧊 偏冷";
+        advice = "先降頻，不連發；再用一次不壓迫邀約做分水嶺，沒接球就停 3 天。";
+      }
+
+      return { score, label, advice };
+    }
+
+    // ===== Events =====
+    elImage.addEventListener('change', async () => {
+      const files = Array.from(elImage.files || []);
+      if(!files.length) return;
+
+      clearStatus();
+      elResult.textContent = "";
+      elHint.textContent = "";
+      elReplyCoach.style.display = "none";
+      elCopyBtn.style.display = "none";
+
+      // 新一批上傳：先清掉「手動覆蓋」
+      picked = [];
+      latestHerReplyMinutes = null;
+
+      // 預設：先不清空 pendingTimes，等最後一張 OCR 後更新
+      pendingTimes = [];
+      elTimePicker.innerHTML = "";
+      elTimeStats.textContent = loadReplyHistory().length ? buildReplyStatsText(loadReplyHistory()) : "";
+
+      for(let i=0;i<files.length;i++){
+        setStatus(`🖼️ 第 ${i+1}/${files.length} 張：縮圖中…`);
+        const dataUrl = await downscaleToDataURL(files[i], 1400, 0.88);
+
+        // 預覽顯示最後一張（避免一直閃）
+        if(i === files.length - 1){
+          elPreview.src = dataUrl;
+          elPreviewWrap.style.display = "block";
+        }
+
+        try{
+          setStatus(`🔍 第 ${i+1}/${files.length} 張：OCR 讀圖中…`);
+          const text = await runOCR(dataUrl);
+          const clean = (text || "").trim();
+          if(!clean){
+            setStatus(`⚠️ 第 ${i+1} 張：沒辨識到文字（略過）。`);
+            continue;
+          }
+
+          appendChatHistory({ ts: Date.now(), text: clean });
+          elChat.value = clean; // 把最新一張塞進文字框，方便你改
+          renderHistory();
+
+          // 只用「最後一張」的時間來做自動推定/手動修正（最符合當次情境）
+          if(i === files.length - 1){
+            const raw = extractTimesHHMM(clean);
+            const mode = elAppMode.value;
+            pendingTimes = filterTimesByMode(raw, mode);
+            renderTimePicker(pendingTimes);
+
+            // 自動推定（不記錄到歷史，只是當次預估）
+            const autoMin = autoEstimateReplyMinutes(pendingTimes);
+            if(typeof autoMin === "number"){
+              elTimeGuide.textContent = `✅ 系統自動推定：她大約 ${autoMin} 分鐘回你（你覺得不準再手動點兩個時間修正）`;
+            } else {
+              elTimeGuide.textContent = "⚠️ 系統無法自動推定回覆時間（時間太少或太亂）。你可以手動點：你發→她回。";
+            }
+          }
+
+          setStatus(`✅ 第 ${i+1}/${files.length} 張：完成（已存本機）。`);
+        } catch(e){
+          console.error(e);
+          setStatus(`❌ 第 ${i+1}/${files.length} 張：OCR 失敗（略過）。`);
+        }
+      }
+
+      renderTrendChart();
+      setStatus("✅ 全部處理完成：你可以直接按「開始分析」。");
+    });
+
+    // 模式切換：如果已經有 pendingTimes，就重新過濾+重畫按鈕
+    elAppMode.addEventListener("change", () => {
+      if(!pendingTimes || !pendingTimes.length){
+        // 若 pendingTimes 目前是空，但也可能 raw 已經丟掉；這裡就不硬重算
+        return;
+      }
+      // 這裡不重抓 raw（省事）；用現有 pendingTimes 再過濾意義不大，所以保留
+      // 若你想更嚴謹：下一次上傳時就會套用新模式
+    });
+
+    elAnalyzeBtn.addEventListener('click', () => {
+      const typed = (elChat.value || "").trim();
+      const history = loadChatHistory();
+      const allText = history.map(x => x.text).join("\n\n---\n\n");
+      const textForAnalysis = (allText + (typed ? ("\n\n[最新補充]\n" + typed) : "")).trim();
+
+      if(!textForAnalysis){
+        elResult.textContent = "⚠️ 沒有可分析的文字";
+        elHint.textContent = "先上傳截圖或貼幾句文字。";
+        return;
+      }
+
+      // 回覆時間：手動覆蓋優先；否則用自動推定
+      let replyMin = latestHerReplyMinutes;
+      let autoUsed = false;
+      if(replyMin == null){
+        const autoMin = autoEstimateReplyMinutes(pendingTimes);
+        if(typeof autoMin === "number"){
+          replyMin = autoMin;
+          autoUsed = true;
+        }
+      }
+
+      clearStatus();
+      const { score, label, advice } = analyzeText(textForAnalysis, replyMin);
+
+      const hCount = history.length;
+      const replyText = (typeof replyMin === "number")
+        ? (autoUsed ? `她約 ${replyMin} 分回（自動推定）` : `她回你 ${replyMin} 分（手動修正）`)
+        : "回覆時間：未知";
+
+      elResult.textContent = `${label}（累積 ${hCount} 次｜${replyText}）`;
+      elHint.textContent = advice + (autoUsed ? "\n\n（提示：你覺得回覆時間不準，可在下方手動點『你發→她回』覆蓋。）" : "");
+
+      // 回覆教練
+      const coach = buildReplyCoach(label, replyMin);
+      elReplyCoach.style.display = "block";
+      elReplyCoach.innerHTML =
+        `<b>${coach.title}</b><br><br>` +
+        `1) ${coach.lines[0]}<br>` +
+        `2) ${coach.lines[1]}<br>` +
+        `3) ${coach.lines[2]}<br><br>` +
+        `<span style="opacity:.9">🛑 ${coach.stoploss}</span>`;
+
+      elCopyBtn.style.display = "block";
+      elCopyBtn.textContent = "一鍵複製建議";
+      elCopyBtn.onclick = async () => {
+        const text = coach.lines[0];
+        try{
+          await navigator.clipboard.writeText(text);
+          elCopyBtn.textContent = "✅ 已複製（去貼給她）";
+          setTimeout(()=> elCopyBtn.textContent = "一鍵複製建議", 1200);
+        } catch(e){
+          alert("複製失敗：請長按手動複製第一句。");
+        }
+      };
+    });
+
+    document.getElementById("clearBtn").addEventListener("click", () => {
+      localStorage.removeItem(STORE_CHAT_KEY);
+      localStorage.removeItem(STORE_REPLY_KEY);
+
+      // reset UI
+      elChat.value = "";
+      elPreviewWrap.style.display = "none";
+      elPreview.src = "";
+      elTimePicker.innerHTML = "";
+      elTimeGuide.textContent = "已清除。請重新上傳截圖。";
+      elTimeStats.textContent = "";
+      pendingTimes = [];
+      picked = [];
+      latestHerReplyMinutes = null;
+
+      elResult.textContent = "";
+      elHint.textContent = "";
+      elReplyCoach.style.display = "none";
+      elCopyBtn.style.display = "none";
+
+      clearStatus();
+      renderHistory();
+      renderTrendChart();
+      setStatus("🧹 已清除本機對話與回覆紀錄。");
+    });
+
+    document.getElementById("exportBtn").addEventListener("click", () => {
+      const payload = {
+        chatHistory: loadChatHistory(),
+        replyHistory: loadReplyHistory()
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "chat_history_export.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // init
+    renderHistory();
+    renderTrendChart();
+  </script>
 </body>
 </html>
