@@ -1,156 +1,221 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8" />
-<title>聊天溫度計（免費版）</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8" />
+  <title>聊天溫度計（免費）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont;
+      background:#0f172a;
+      color:#e5e7eb;
+      display:flex;
+      justify-content:center;
+      padding:40px 16px;
+    }
+    .card{
+      width:100%;
+      max-width:520px;
+      background:#020617;
+      border-radius:16px;
+      padding:20px;
+      box-shadow:0 20px 40px rgba(0,0,0,.5);
+      position:relative;
+    }
+    /* B：更像 App 的漸層邊框感 */
+    .card:before{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      border-radius:16px;
+      background:linear-gradient(135deg, rgba(56,189,248,.25), rgba(99,102,241,.18));
+      z-index:-1;
+    }
+    h1{ text-align:center; margin:0 0 6px; font-size:22px; }
+    .sub{ text-align:center; font-size:14px; opacity:.8; margin:0 0 12px; }
 
-<style>
-body{
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
-  background:#0f172a;
-  color:#e5e7eb;
-  display:flex;
-  justify-content:center;
-  padding:32px 12px;
-}
-.card{
-  width:100%;
-  max-width:520px;
-  background:#020617;
-  border-radius:16px;
-  padding:20px;
-  box-shadow:0 20px 40px rgba(0,0,0,.45);
-}
-h1{
-  text-align:center;
-  margin:0 0 6px;
-}
-.sub{
-  text-align:center;
-  font-size:14px;
-  opacity:.8;
-  margin-bottom:14px;
-}
-input[type=file]{
-  width:100%;
-  padding:10px;
-  border-radius:12px;
-  background:#0b1220;
-  border:1px solid rgba(255,255,255,.1);
-  color:#e5e7eb;
-}
-textarea{
-  width:100%;
-  margin-top:10px;
-  height:110px;
-  border-radius:12px;
-  border:none;
-  padding:12px;
-  font-size:14px;
-  box-sizing:border-box;
-  resize:none;
-  outline:none;
-}
-.preview{
-  margin-top:10px;
-  display:none;
-}
-.preview img{
-  width:100%;
-  border-radius:12px;
-}
-button{
-  width:100%;
-  margin-top:14px;
-  padding:12px;
-  border:none;
-  border-radius:999px;
-  background:#38bdf8;
-  color:#020617;
-  font-weight:800;
-  font-size:16px;
-}
-.result{
-  margin-top:16px;
-  text-align:center;
-  font-size:18px;
-  min-height:28px;
-}
-.hint{
-  margin-top:10px;
-  font-size:12px;
-  opacity:.7;
-  line-height:1.4;
-}
-</style>
+    input[type=file]{
+      width:100%;
+      padding:10px;
+      background:#0b1220;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.08);
+      color:#e5e7eb;
+      box-sizing:border-box;
+    }
+    textarea{
+      width:100%;
+      height:110px;
+      margin-top:10px;
+      border-radius:12px;
+      border:none;
+      padding:12px;
+      box-sizing:border-box;
+      font-size:14px;
+      outline:none;
+      resize:none;
+      background:#0b1220;
+      color:#e5e7eb;
+    }
+    .preview{
+      margin-top:10px;
+      display:none;
+      background:#0b1220;
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:12px;
+      padding:10px;
+    }
+    .preview img{ width:100%; border-radius:10px; display:block; }
+
+    button{
+      width:100%;
+      margin-top:14px;
+      padding:14px;
+      border-radius:999px;
+      border:none;
+      background:#38bdf8;
+      color:#020617;
+      font-weight:800;
+      font-size:16px;
+      cursor:pointer;
+    }
+
+    /* B：結果卡片化 */
+    .resultBox{
+      margin-top:14px;
+      padding:12px;
+      border-radius:12px;
+      background:#0b1220;
+      border:1px solid rgba(255,255,255,.08);
+      text-align:center;
+    }
+    .result{
+      font-size:18px;
+      min-height:28px;
+      line-height:1.4;
+    }
+    .hint{
+      margin-top:10px;
+      font-size:12px;
+      opacity:.75;
+      line-height:1.45;
+    }
+    a{ color:#38bdf8; }
+  </style>
 </head>
 
 <body>
-<div class="card">
-  <h1>聊天溫度計 🌡️</h1>
-  <div class="sub">免費版｜可只傳照片，也可輸入文字</div>
+  <div class="card">
+    <h1>聊天溫度計 🌡️</h1>
+    <div class="sub">免費版｜傳照片或貼聊天文字都可以</div>
 
-  <!-- 上傳圖片 -->
-  <input id="image" type="file" accept="image/*" />
+    <input id="image" type="file" accept="image/*" />
 
-  <!-- 圖片預覽 -->
-  <div class="preview" id="previewWrap">
-    <img id="previewImg" />
+    <div class="preview" id="previewWrap">
+      <img id="preview" alt="截圖預覽">
+      <div class="hint">✅ 已選擇圖片（免費版不讀圖內容；想更準請貼幾句文字）</div>
+    </div>
+
+    <textarea id="chat" placeholder="（可選）貼聊天內容：例如『她回很慢還要聊嗎』"></textarea>
+
+    <button onclick="analyze()">開始分析</button>
+
+    <div class="resultBox">
+      <div class="result" id="result"></div>
+      <div class="hint" id="mini"></div>
+    </div>
+
+    <!-- C：結果後顯示升級入口 -->
+    <div class="hint" id="upgradeWrap" style="display:none;">
+      想看「為什麼 + 24 小時怎麼做」→ <a href="./paid.html">升級完整分析</a>
+    </div>
+
+    <div class="hint">
+      使用說明：<br/>
+      • 有貼文字 → 依文字判斷（較準）<br/>
+      • 沒貼文字但有照片 → 給中性提示（不亂猜）<br/>
+      • 沒照片也沒文字 → 會提醒你補資料
+    </div>
   </div>
-
-  <!-- 文字輸入（可空白） -->
-  <textarea id="chat" placeholder="（可選）貼上聊天內容或直接不打字"></textarea>
-
-  <button onclick="analyze()">分析溫度</button>
-
-  <div class="result" id="result"></div>
-
-  <div class="hint">
-    🔹 不用登入<br>
-    🔹 不用付費<br>
-    🔹 照片可直接判斷（免費版為簡易判斷）
-  </div>
-</div>
 
 <script>
-const imageInput = document.getElementById("image");
-const previewWrap = document.getElementById("previewWrap");
-const previewImg = document.getElementById("previewImg");
+  const imageInput = document.getElementById("image");
+  const previewWrap = document.getElementById("previewWrap");
+  const preview = document.getElementById("preview");
 
-imageInput.addEventListener("change",()=>{
-  const file = imageInput.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e=>{
-    previewImg.src = e.target.result;
+  imageInput.addEventListener("change", () => {
+    const file = imageInput.files && imageInput.files[0];
+    if (!file) {
+      previewWrap.style.display = "none";
+      preview.src = "";
+      return;
+    }
+    preview.src = URL.createObjectURL(file);
     previewWrap.style.display = "block";
-  };
-  reader.readAsDataURL(file);
-});
+  });
 
-function analyze(){
-  const text = document.getElementById("chat").value.trim();
-  const hasImage = imageInput.files.length > 0;
-  const result = document.getElementById("result");
+  function analyze(){
+    const text = document.getElementById("chat").value.trim();
+    const hasImage = (imageInput.files && imageInput.files.length > 0);
 
-  if(!hasImage && text.length === 0){
-    result.textContent = "❗請上傳圖片或輸入文字";
-    return;
+    const result = document.getElementById("result");
+    const mini = document.getElementById("mini");
+    const upgrade = document.getElementById("upgradeWrap");
+
+    // 沒資料
+    if(!hasImage && text.length === 0){
+      result.textContent = "⚠️ 請先上傳截圖或貼幾句文字";
+      mini.textContent = "";
+      upgrade.style.display = "none";
+      return;
+    }
+
+    // 只有照片：免費版不讀圖，避免亂判
+    if(hasImage && text.length === 0){
+      result.textContent = "📷 已收到圖片（免費版不讀圖內容）";
+      mini.textContent = "建議：再貼 1~3 句對話，判斷會準很多。";
+      upgrade.style.display = "block";
+      return;
+    }
+
+    // A：台灣聊天用語詞庫（更準）
+    let score = 0;
+
+    const HOT = [
+      "想你","想見你","想約你","我想你","抱抱","親親","愛你","喜歡你","寶","寶貝",
+      "❤️","😘","😍","晚安❤️","想你了"
+    ];
+    const WARM = [
+      "哈哈","笑死","欸","在嗎","你在幹嘛","幹嘛","可以啊","好呀","OK","行","可以",
+      "晚安","早安","吃飯","出去","約嗎","下次","改天"
+    ];
+    const COLD = [
+      "嗯","喔","哦","好","隨便","不知道","再說","忙","先這樣","掰","呵",
+      "已讀","已讀不回","回很慢","敷衍","不回","都我主動"
+    ];
+
+    HOT.forEach(w => { if (text.includes(w)) score += 2; });
+    WARM.forEach(w => { if (text.includes(w)) score += 1; });
+    COLD.forEach(w => { if (text.includes(w)) score -= 1; });
+
+    // A：小規則讓誤判更少
+    if (text.replace(/\s/g,"").length <= 2) score -= 1;
+    ["已讀不回","回很慢","都我主動"].forEach(w => { if (text.includes(w)) score -= 2; });
+
+    let label = "😐 普通";
+    let tip = "你可以再用一句輕鬆問題測對方會不會接球。";
+
+    if (score >= 5) { label = "🔥 很熱"; tip = "趁熱把邀約落地：時間/地點給一個選項就好。"; }
+    else if (score >= 3) { label = "🌤️ 曖昧"; tip = "保持節奏：短句＋收尾，不要連發追問。"; }
+    else if (score <= 0) { label = "❄️ 偏冷"; tip = "先停追：24 小時不主動，讓對方有空間回來。"; }
+
+    result.textContent = label;
+    mini.textContent = tip;
+
+    // C：顯示升級入口（不破壞免費）
+    upgrade.style.display = "block";
   }
-
-  let score = 0;
-  const hot = ["想你","愛","抱","親","晚安❤️","哈哈","寶"];
-  const cold = ["嗯","喔","隨便","不知道","再說","忙"];
-
-  hot.forEach(w=>{ if(text.includes(w)) score+=2; });
-  cold.forEach(w=>{ if(text.includes(w)) score-=1; });
-
-  if(score >= 3) result.textContent = "🔥 很熱";
-  else if(score >= 1) result.textContent = "🌤 有點溫度";
-  else result.textContent = "❄️ 偏冷";
-}
 </script>
 </body>
 </html>
