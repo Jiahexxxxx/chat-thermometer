@@ -2,296 +2,178 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <title>聊天溫度計</title>
+  <title>完整分析（升級）｜聊天溫度計</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body{font-family:system-ui,-apple-system;background:#0f172a;color:#e5e7eb;margin:0;display:flex;justify-content:center;padding:36px 14px}
-    .card{width:100%;max-width:520px;background:#020617;border-radius:16px;padding:18px;box-shadow:0 18px 40px rgba(0,0,0,.45)}
-    h1{text-align:center;margin:0 0 6px}
-    .sub{text-align:center;opacity:.8;font-size:14px;margin-bottom:12px}
-    input[type=file]{width:100%;padding:10px;border-radius:12px;background:#0b1220;border:1px solid rgba(255,255,255,.08);color:#e5e7eb;box-sizing:border-box}
-    textarea{width:100%;height:90px;margin-top:10px;border-radius:12px;border:none;padding:10px;box-sizing:border-box;font-size:14px;outline:none}
-    .preview{margin-top:10px;display:none;background:#0b1220;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px}
-    .preview img{width:100%;border-radius:10px;display:block}
-    button{width:100%;margin-top:12px;padding:12px;border:none;border-radius:999px;background:#38bdf8;color:#020617;font-weight:800;font-size:16px}
-    button:disabled{opacity:.6}
-    .result{margin-top:14px;text-align:center;font-size:18px;min-height:28px}
-    .hint{margin-top:8px;font-size:12px;opacity:.78;line-height:1.45}
-    .crop{margin-top:10px}
-    .crop label{display:block;font-size:12px;opacity:.85;margin-top:8px}
-    .crop input{width:100%}
-    .badge{display:inline-block;font-size:12px;padding:6px 10px;border-radius:999px;background:rgba(56,189,248,.14);border:1px solid rgba(56,189,248,.25);color:#cfefff}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont;
+      background:#0f172a;
+      color:#e5e7eb;
+      display:flex;
+      justify-content:center;
+      padding:40px 16px;
+    }
+    .card{
+      width:100%;
+      max-width:560px;
+      background:#020617;
+      border-radius:16px;
+      padding:20px;
+      box-shadow:0 20px 40px rgba(0,0,0,.5);
+      position:relative;
+    }
+    .card:before{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      border-radius:16px;
+      background:linear-gradient(135deg, rgba(56,189,248,.25), rgba(99,102,241,.18));
+      z-index:-1;
+    }
+    h1{ margin:0 0 10px; font-size:20px; }
+    .sub{ margin:0 0 14px; opacity:.8; font-size:13px; line-height:1.45; }
+    .tag{
+      display:inline-block;
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(56,189,248,.14);
+      border:1px solid rgba(56,189,248,.25);
+      color:#cfefff;
+      margin-bottom:10px;
+    }
+    .box{
+      background:#0b1220;
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:12px;
+      padding:12px;
+      margin-top:12px;
+    }
+    .box b{ display:block; margin-bottom:8px; }
+    .line{ line-height:1.6; }
+    .btn{
+      display:block;
+      text-align:center;
+      margin-top:14px;
+      padding:12px;
+      border-radius:999px;
+      background:#38bdf8;
+      color:#020617;
+      font-weight:900;
+      text-decoration:none;
+    }
+    .btn2{
+      display:block;
+      text-align:center;
+      margin-top:10px;
+      padding:12px;
+      border-radius:999px;
+      background:#0b1220;
+      border:1px solid rgba(255,255,255,.12);
+      color:#e5e7eb;
+      text-decoration:none;
+      font-weight:700;
+    }
+    .small{
+      margin-top:10px;
+      font-size:12px;
+      opacity:.75;
+      line-height:1.5;
+    }
+    code{
+      display:block;
+      white-space:pre-wrap;
+      background:#0b1220;
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:12px;
+      padding:10px;
+      line-height:1.6;
+      margin-top:8px;
+    }
+    a{ color:#38bdf8; }
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>聊天溫度計 🌡️</h1>
-    <div class="sub">上傳截圖可自動辨識｜也可以直接打字</div>
+    <div class="tag" id="badge">完整分析</div>
+    <h1 id="title">你的完整分析（升級版）</h1>
+    <p class="sub" id="hook">
+      這頁給你的是「為什麼」與「接下來 24 小時怎麼做」。
+      如果你只看免費分數，你會一直猜；這裡讓你直接做決策。
+    </p>
 
-    <input id="image" type="file" accept="image/*" />
-
-    <div class="preview" id="previewWrap">
-      <img id="preview" alt="截圖預覽" />
-      <div class="hint"><span class="badge">✅ 已選擇圖片</span>（圖片不會上傳到伺服器）</div>
+    <div class="box">
+      <b>1) 先判斷：你現在最可能卡在哪？</b>
+      <div class="line" id="core"></div>
     </div>
 
-    <div class="crop">
-      <div class="hint">裁切聊天區（提升中文OCR準確 / 更快）：先用預設，不準再調</div>
-
-      <label>上方裁切：<span id="ct">10</span>%</label>
-      <input id="cropTop" type="range" min="0" max="30" value="10">
-
-      <label>下方裁切：<span id="cb">8</span>%</label>
-      <input id="cropBottom" type="range" min="0" max="30" value="8">
-
-      <label>左右裁切：<span id="cl">4</span>%</label>
-      <input id="cropSide" type="range" min="0" max="15" value="4">
+    <div class="box">
+      <b>2) 24 小時行動（照做就好）</b>
+      <div class="line" id="plan"></div>
     </div>
 
-    <textarea id="manualText" placeholder="（選填）你也可以直接打幾句重點，例如：她回很慢還要聊嗎"></textarea>
+    <div class="box">
+      <b>3) 你可以直接複製貼上的一句話</b>
+      <div class="line">選一個你最像的情境，直接貼出去：</div>
+      <code id="copyLine"></code>
+    </div>
 
-    <button id="analyzeBtn" onclick="analyze()">開始分析</button>
+    <div class="box">
+      <b>4) 止損線（保護你自己）</b>
+      <div class="line" id="stop"></div>
+    </div>
 
-    <div class="result" id="result"></div>
-    <div class="hint" id="statusHint"></div>
-    <div class="hint" id="sourceHint"></div>
+    <a class="btn" href="#" onclick="alertPay(); return false;">💳 付 29 元解鎖「更準＋更完整」版本</a>
+    <a class="btn2" href="./index.html">← 回免費首頁</a>
+
+    <div class="small">
+      目前是「升級內容示範版」：你要真的收錢時，把上面按鈕改成你的收款連結（轉帳/Line Pay/收款平台都行）。
+      <br/>如果你想我幫你設「付費後顯示完整內容」的版本，我可以用最簡單的方式做到。
+    </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-  <script>
-    // ===== UI refs =====
-    const imageInput = document.getElementById("image");
-    const previewWrap = document.getElementById("previewWrap");
-    const preview = document.getElementById("preview");
-    const btn = document.getElementById("analyzeBtn");
-    const resultDiv = document.getElementById("result");
-    const statusHint = document.getElementById("statusHint");
-    const sourceHint = document.getElementById("sourceHint");
+<script>
+  // 這版先不靠 query 參數，直接給你一套「通用升級內容」
+  // 你之後若要依「冷/普通/曖昧/很熱」顯示不同內容，再跟我說，我會幫你改成動態版。
+  const badge = document.getElementById("badge");
+  const core = document.getElementById("core");
+  const plan = document.getElementById("plan");
+  const copyLine = document.getElementById("copyLine");
+  const stop = document.getElementById("stop");
 
-    const cropTop = document.getElementById("cropTop");
-    const cropBottom = document.getElementById("cropBottom");
-    const cropSide = document.getElementById("cropSide");
+  // 這裡用「最常見、最實用」的框架：投入不對等 / 節奏錯位 / 缺少落地
+  badge.textContent = "升級分析：讓你少猜、直接做";
 
-    const ct = document.getElementById("ct");
-    const cb = document.getElementById("cb");
-    const cl = document.getElementById("cl");
+  core.innerHTML =
+    "你現在的痛點通常不是『她喜不喜歡』，而是<strong>投入不對等</strong>：你一直主動、一直想確認；對方回很慢或很少，讓你陷入反覆猜。<br>" +
+    "真正要解的是：<strong>節奏</strong>（你是不是追太緊）＋<strong>落地</strong>（有沒有把關係往現實推進）。";
 
-    const manualTextEl = document.getElementById("manualText");
+  plan.innerHTML =
+    "<strong>接下來 24 小時：</strong><br>" +
+    "① 先停連發：不要連續追問、不要用長段落解釋自己。<br>" +
+    "② 只用一個輕量訊息測她會不會接球。<br>" +
+    "③ 她接球 → 給一個『可落地的邀約』；她不接 → 你就收手，不再消耗。";
 
-    let ocrText = "";
-    let lastFile = null;
+  copyLine.textContent =
+`（輕量測試）
+欸我剛想到你上次說的那個😂 你現在方便回嗎？
 
-    // ===== slider display =====
-    function syncSliders(){
-      ct.textContent = cropTop.value;
-      cb.textContent = cropBottom.value;
-      cl.textContent = cropSide.value;
-    }
-    ["input","change"].forEach(ev=>{
-      cropTop.addEventListener(ev, syncSliders);
-      cropBottom.addEventListener(ev, syncSliders);
-      cropSide.addEventListener(ev, syncSliders);
-    });
-    syncSliders();
+（不壓迫的邀約）
+這週你哪天比較有空？我想請你喝個飲料/吃個小東西～
 
-    // ===== OCR workers (fast then best) =====
-    let fastWorker = null;
-    let bestWorker = null;
+（對方回很慢的收尾）
+沒事你忙～有空再回就好🙂`;
 
-    async function ensureWorkers() {
-      if (!fastWorker) {
-        fastWorker = await Tesseract.createWorker("chi_tra+eng", 1, {
-          langPath: "https://tessdata.projectnaptha.com/4.0.0_fast"
-        });
-      }
-      if (!bestWorker) {
-        bestWorker = await Tesseract.createWorker("chi_tra+eng", 1, {
-          langPath: "https://tessdata.projectnaptha.com/4.0.0_best"
-        });
-      }
-    }
+  stop.innerHTML =
+    "<strong>止損線很簡單：</strong><br>" +
+    "你連續 2 次丟球，她都沒有接（只回『嗯/好/喔』或隔很久敷衍），就停止主動 3 天。<br>" +
+    "如果 3 天內她完全沒動作，代表你不用再投入（至少先轉移注意力，保護自尊）。";
 
-    // ===== image preprocess: crop + scale + grayscale + contrast =====
-    async function preprocessImageToBlob(file, scale = 2) {
-      const topPct = (+cropTop.value)/100;
-      const bottomPct = (+cropBottom.value)/100;
-      const sidePct = (+cropSide.value)/100;
-
-      const img = new Image();
-      img.src = URL.createObjectURL(file);
-      await new Promise((res, rej) => { img.onload = res; img.onerror = rej; });
-
-      const sx = Math.floor(img.width * sidePct);
-      const sy = Math.floor(img.height * topPct);
-      const sw = Math.floor(img.width * (1 - sidePct * 2));
-      const sh = Math.floor(img.height * (1 - topPct - bottomPct));
-
-      const safeW = Math.max(80, sw);
-      const safeH = Math.max(80, sh);
-
-      const canvas = document.createElement("canvas");
-      canvas.width = Math.floor(safeW * scale);
-      canvas.height = Math.floor(safeH * scale);
-
-      const ctx = canvas.getContext("2d");
-      ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(img, sx, sy, safeW, safeH, 0, 0, canvas.width, canvas.height);
-
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const d = imageData.data;
-
-      const contrast = 1.35;
-      const intercept = 128 * (1 - contrast);
-
-      for (let i = 0; i < d.length; i += 4) {
-        const r = d[i], g = d[i+1], b = d[i+2];
-        let v = 0.299*r + 0.587*g + 0.114*b;
-        v = v * contrast + intercept;
-        v = Math.max(0, Math.min(255, v));
-        d[i] = d[i+1] = d[i+2] = v;
-      }
-      ctx.putImageData(imageData, 0, 0);
-
-      return await new Promise(res => canvas.toBlob(res, "image/png"));
-    }
-
-    function cleanOcrText(raw) {
-      if (!raw) return "";
-      let t = raw.replace(/\r/g, "\n").replace(/[ \t]+/g, " ").replace(/\n{3,}/g, "\n\n").trim();
-      t = t.replace(/[|¦·•◦●■□◆◇]/g, "");
-      const lines = t.split("\n").map(s => s.trim()).filter(Boolean);
-      const kept = lines.filter(l => l.length >= 2);
-      return kept.join("\n").trim();
-    }
-
-    function needBest(text) {
-      if (!text) return true;
-      const compactLen = text.replace(/\s/g, "").length;
-      if (compactLen < 25) return true;
-      const cjkCount = (text.match(/[\u4e00-\u9fff]/g) || []).length;
-      if (cjkCount < 8) return true;
-      const weird = (text.match(/[^\u4e00-\u9fffA-Za-z0-9，。！？：()「」『』\n ]/g) || []).length;
-      const weirdRatio = weird / Math.max(1, compactLen);
-      if (weirdRatio > 0.08) return true;
-      return false;
-    }
-
-    async function runOcr(worker, blob, label) {
-      await worker.setParameters({ tessedit_pageseg_mode: "6" });
-      const { data } = await worker.recognize(blob, {
-        logger: m => {
-          if (m.status === "recognizing text") {
-            const p = Math.round((m.progress || 0) * 100);
-            statusHint.textContent = `${label}… ${p}%`;
-          }
-        }
-      });
-      return cleanOcrText(data.text);
-    }
-
-    // ===== source hint (photo/text) =====
-    function updateSourceHint() {
-      const typed = (manualTextEl.value || "").trim();
-      const hasTyped = typed.length > 0;
-      const hasOcr = (ocrText || "").trim().length > 0;
-
-      if (!hasTyped && !hasOcr) {
-        sourceHint.textContent = "目前：尚未輸入文字，也未完成截圖辨識";
-      } else if (hasTyped && hasOcr) {
-        sourceHint.textContent = "目前：✅ 使用「你輸入的文字」(優先)；截圖辨識結果已備用";
-      } else if (hasTyped) {
-        sourceHint.textContent = "目前：✅ 使用「你輸入的文字」";
-      } else {
-        sourceHint.textContent = "目前：✅ 使用「截圖辨識文字」";
-      }
-    }
-
-    manualTextEl.addEventListener("input", updateSourceHint);
-
-    // ===== image upload => OCR automatically =====
-    imageInput.addEventListener("change", async () => {
-      const file = imageInput.files && imageInput.files[0];
-      if (!file) return;
-
-      lastFile = file;
-      preview.src = URL.createObjectURL(file);
-      previewWrap.style.display = "block";
-
-      // start OCR status
-      ocrText = "";
-      updateSourceHint();
-      resultDiv.textContent = "";
-      statusHint.textContent = "🧠 正在辨識截圖文字，請稍候…";
-      btn.disabled = true;
-
-      try {
-        // preprocess
-        statusHint.textContent = "🧠 正在強化截圖清晰度…";
-        const blob = await preprocessImageToBlob(file, 2);
-
-        // ensure workers
-        statusHint.textContent = "🧠 載入辨識引擎（第一次較久）…";
-        await ensureWorkers();
-
-        // fast pass
-        statusHint.textContent = "⚡ 快速辨識中… 0%";
-        let text = await runOcr(fastWorker, blob, "⚡ 快速辨識中");
-
-        // best if needed
-        if (needBest(text)) {
-          statusHint.textContent = "🎯 正在提升中文準確度… 0%";
-          text = await runOcr(bestWorker, blob, "🎯 提升中文準確度");
-        }
-
-        ocrText = (text || "").trim();
-        if (!ocrText) {
-          statusHint.textContent = "❌ 辨識不到文字：請換更清楚的截圖（字更大、不要太長）。";
-          btn.disabled = false;
-          updateSourceHint();
-          return;
-        }
-
-        statusHint.textContent = "✅ 辨識完成，可以開始分析";
-        btn.disabled = false;
-        updateSourceHint();
-      } catch (e) {
-        statusHint.textContent = "❌ 辨識失敗，請換清楚一點的截圖或稍後再試";
-        btn.disabled = false;
-        updateSourceHint();
-      }
-    });
-
-    // ===== analysis (typed first, else OCR) =====
-    function analyze() {
-      const typed = (manualTextEl.value || "").trim();
-      const text = typed || ocrText;
-
-      updateSourceHint();
-
-      if (!text) {
-        resultDiv.textContent = "請上傳截圖或打幾句文字 🙂";
-        return;
-      }
-
-      let score = 0;
-      const hot = ["想你","抱","親","晚安❤️","愛你","喜歡你","想見你","想見面","寶","😘","❤️"];
-      const warm = ["哈哈","怎樣","幹嘛","在嗎","晚安","可以","OK","好呀","笑死","怎麼了"];
-      const cold = ["回很慢","已讀不回","都我主動","不回","敷衍","嗯","哦","好","隨便"];
-
-      hot.forEach(w => { if (text.includes(w)) score += 2; });
-      warm.forEach(w => { if (text.includes(w)) score += 1; });
-      cold.forEach(w => { if (text.includes(w)) score -= 1; });
-
-      let label = "❄️ 偏冷";
-      if (score >= 5) label = "🔥 很熱";
-      else if (score >= 3) label = "🌤️ 曖昧";
-      else if (score >= 1) label = "🙂 普通";
-
-      resultDiv.textContent = label;
-    }
-
-    // init hints
-    updateSourceHint();
-  </script>
+  function alertPay(){
+    alert("示範版：這裡之後改成你的收款連結（例如 Line Pay / 轉帳頁）。\n\n你要我幫你接『付費後顯示完整版』嗎？");
+  }
+  window.alertPay = alertPay;
+</script>
 </body>
 </html>
