@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<title>聊天溫度計（免費版）</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<style>
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
+  background:#0f172a;
+  color:#e5e7eb;
+  display:flex;
+  justify-content:center;
+  padding:32px 12px;
+}
+.card{
+  width:100%;
+  max-width:520px;
+  background:#020617;
+  border-radius:16px;
+  padding:20px;
+  box-shadow:0 20px 40px rgba(0,0,0,.45);
+}
+h1{
+  text-align:center;
+  margin:0 0 6px;
+}
+.sub{
+  text-align:center;
+  font-size:14px;
+  opacity:.8;
+  margin-bottom:14px;
+}
+input[type=file]{
+  width:100%;
+  padding:10px;
+  border-radius:12px;
+  background:#0b1220;
+  border:1px solid rgba(255,255,255,.1);
+  color:#e5e7eb;
+}
+textarea{
+  width:100%;
+  margin-top:10px;
+  height:110px;
+  border-radius:12px;
+  border:none;
+  padding:12px;
+  font-size:14px;
+  box-sizing:border-box;
+  resize:none;
+  outline:none;
+}
+.preview{
+  margin-top:10px;
+  display:none;
+}
+.preview img{
+  width:100%;
+  border-radius:12px;
+}
+button{
+  width:100%;
+  margin-top:14px;
+  padding:12px;
+  border:none;
+  border-radius:999px;
+  background:#38bdf8;
+  color:#020617;
+  font-weight:800;
+  font-size:16px;
+}
+.result{
+  margin-top:16px;
+  text-align:center;
+  font-size:18px;
+  min-height:28px;
+}
+.hint{
+  margin-top:10px;
+  font-size:12px;
+  opacity:.7;
+  line-height:1.4;
+}
+</style>
+</head>
+
+<body>
+<div class="card">
+  <h1>聊天溫度計 🌡️</h1>
+  <div class="sub">免費版｜可只傳照片，也可輸入文字</div>
+
+  <!-- 上傳圖片 -->
+  <input id="image" type="file" accept="image/*" />
+
+  <!-- 圖片預覽 -->
+  <div class="preview" id="previewWrap">
+    <img id="previewImg" />
+  </div>
+
+  <!-- 文字輸入（可空白） -->
+  <textarea id="chat" placeholder="（可選）貼上聊天內容或直接不打字"></textarea>
+
+  <button onclick="analyze()">分析溫度</button>
+
+  <div class="result" id="result"></div>
+
+  <div class="hint">
+    🔹 不用登入<br>
+    🔹 不用付費<br>
+    🔹 照片可直接判斷（免費版為簡易判斷）
+  </div>
+</div>
+
+<script>
+const imageInput = document.getElementById("image");
+const previewWrap = document.getElementById("previewWrap");
+const previewImg = document.getElementById("previewImg");
+
+imageInput.addEventListener("change",()=>{
+  const file = imageInput.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    previewImg.src = e.target.result;
+    previewWrap.style.display = "block";
+  };
+  reader.readAsDataURL(file);
+});
+
+function analyze(){
+  const text = document.getElementById("chat").value.trim();
+  const hasImage = imageInput.files.length > 0;
+  const result = document.getElementById("result");
+
+  if(!hasImage && text.length === 0){
+    result.textContent = "❗請上傳圖片或輸入文字";
+    return;
+  }
+
+  let score = 0;
+  const hot = ["想你","愛","抱","親","晚安❤️","哈哈","寶"];
+  const cold = ["嗯","喔","隨便","不知道","再說","忙"];
+
+  hot.forEach(w=>{ if(text.includes(w)) score+=2; });
+  cold.forEach(w=>{ if(text.includes(w)) score-=1; });
+
+  if(score >= 3) result.textContent = "🔥 很熱";
+  else if(score >= 1) result.textContent = "🌤 有點溫度";
+  else result.textContent = "❄️ 偏冷";
+}
+</script>
+</body>
+</html>
