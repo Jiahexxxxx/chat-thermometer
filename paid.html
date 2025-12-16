@@ -2,178 +2,277 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <title>完整分析（升級）｜聊天溫度計</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>聊天溫度計｜升級完整版（示範解鎖）</title>
   <style>
+    :root{
+      --bg:#0f172a;
+      --card:#020617;
+      --text:#e5e7eb;
+      --muted:rgba(229,231,235,.78);
+      --line:rgba(255,255,255,.08);
+      --btn:#38bdf8;
+      --btnText:#020617;
+      --danger:#fb7185;
+      --ok:#34d399;
+      --shadow:0 18px 40px rgba(0,0,0,.45);
+      --radius:16px;
+    }
+    *{box-sizing:border-box;}
     body{
       margin:0;
-      font-family:system-ui,-apple-system,BlinkMacSystemFont;
-      background:#0f172a;
-      color:#e5e7eb;
+      min-height:100vh;
+      background:var(--bg);
+      color:var(--text);
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
       display:flex;
       justify-content:center;
-      padding:40px 16px;
+      padding:36px 14px;
     }
     .card{
       width:100%;
       max-width:560px;
-      background:#020617;
-      border-radius:16px;
-      padding:20px;
-      box-shadow:0 20px 40px rgba(0,0,0,.5);
-      position:relative;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:18px;
+      box-shadow:var(--shadow);
     }
-    .card:before{
-      content:"";
-      position:absolute;
-      inset:-1px;
-      border-radius:16px;
-      background:linear-gradient(135deg, rgba(56,189,248,.25), rgba(99,102,241,.18));
-      z-index:-1;
+    h1{
+      margin:0 0 6px;
+      text-align:center;
+      font-size:20px;
+      letter-spacing:.5px;
     }
-    h1{ margin:0 0 10px; font-size:20px; }
-    .sub{ margin:0 0 14px; opacity:.8; font-size:13px; line-height:1.45; }
+    .sub{
+      text-align:center;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+      margin-bottom:14px;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      font-size:13px;
+      color:var(--muted);
+      margin:10px 0 14px;
+    }
+    .section{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      border-radius:14px;
+      padding:14px;
+      margin:12px 0;
+    }
+    .section h2{
+      margin:0 0 10px;
+      font-size:15px;
+    }
+    .k{
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.65;
+      margin:6px 0;
+    }
+    .btn{
+      width:100%;
+      margin-top:12px;
+      padding:12px 14px;
+      border:none;
+      border-radius:999px;
+      background:var(--btn);
+      color:var(--btnText);
+      font-weight:900;
+      font-size:16px;
+      cursor:pointer;
+    }
+    .btn:active{transform:translateY(1px);}
+    .btn2{
+      width:100%;
+      margin-top:10px;
+      padding:12px 14px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:transparent;
+      color:var(--text);
+      font-weight:800;
+      font-size:15px;
+      cursor:pointer;
+    }
+    .mini{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.55;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:10px;
+    }
+    .box{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
+      background:rgba(255,255,255,.02);
+    }
+    .boxTitle{
+      font-weight:900;
+      margin:0 0 6px;
+      font-size:14px;
+    }
     .tag{
       display:inline-block;
       font-size:12px;
-      padding:6px 10px;
+      padding:4px 10px;
       border-radius:999px;
-      background:rgba(56,189,248,.14);
-      border:1px solid rgba(56,189,248,.25);
-      color:#cfefff;
-      margin-bottom:10px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:var(--muted);
+      margin:6px 6px 0 0;
     }
-    .box{
-      background:#0b1220;
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:12px;
-      padding:12px;
-      margin-top:12px;
-    }
-    .box b{ display:block; margin-bottom:8px; }
-    .line{ line-height:1.6; }
-    .btn{
-      display:block;
-      text-align:center;
-      margin-top:14px;
-      padding:12px;
-      border-radius:999px;
-      background:#38bdf8;
-      color:#020617;
-      font-weight:900;
-      text-decoration:none;
-    }
-    .btn2{
-      display:block;
-      text-align:center;
-      margin-top:10px;
-      padding:12px;
-      border-radius:999px;
-      background:#0b1220;
-      border:1px solid rgba(255,255,255,.12);
-      color:#e5e7eb;
-      text-decoration:none;
-      font-weight:700;
-    }
-    .small{
-      margin-top:10px;
-      font-size:12px;
-      opacity:.75;
-      line-height:1.5;
-    }
-    code{
-      display:block;
-      white-space:pre-wrap;
-      background:#0b1220;
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:12px;
-      padding:10px;
-      line-height:1.6;
-      margin-top:8px;
-    }
-    a{ color:#38bdf8; }
+    .warn{color:var(--danger); font-weight:900;}
+    .ok{color:var(--ok); font-weight:900;}
+    .hr{height:1px; background:var(--line); margin:12px 0;}
+    .hidden{display:none;}
+    a{color:inherit; text-decoration:none;}
   </style>
 </head>
+
 <body>
   <div class="card">
-    <div class="tag" id="badge">完整分析</div>
-    <h1 id="title">你的完整分析（升級版）</h1>
-    <p class="sub" id="hook">
-      這頁給你的是「為什麼」與「接下來 24 小時怎麼做」。
-      如果你只看免費分數，你會一直猜；這裡讓你直接做決策。
-    </p>
-
-    <div class="box">
-      <b>1) 先判斷：你現在最可能卡在哪？</b>
-      <div class="line" id="core"></div>
+    <h1>聊天溫度計｜升級完整版</h1>
+    <div class="sub">
+      這一頁是「示範解鎖版」：你按一下就能看到完整版內容。<br>
+      目的：先測「有人想不想看更完整」，再決定要不要真的接金流。
     </div>
 
-    <div class="box">
-      <b>2) 24 小時行動（照做就好）</b>
-      <div class="line" id="plan"></div>
+    <!-- 鎖定區 -->
+    <div id="locked">
+      <div class="section">
+        <h2>你現在看到的是鎖定內容</h2>
+        <div class="k">
+          這裡通常會放「更精準＋更完整」的分析，例如：<br>
+          1) 對方在拖、還是不擅長回訊息？<br>
+          2) 你下一句該怎麼回？（直接複製貼上）<br>
+          3) 什麼情況該加速、什麼情況該收手？
+        </div>
+        <button class="btn" onclick="unlockNow()">付 29 元解鎖「更準＋更完整」版本（示範）</button>
+        <div class="mini">
+          ※ 目前不會真的收錢，按了就解鎖。<br>
+          ※ 你之後要收款，只要把按鈕改成你的收款連結即可。
+        </div>
+      </div>
+
+      <a href="./index.html"><button class="btn2">← 回免費首頁</button></a>
     </div>
 
-    <div class="box">
-      <b>3) 你可以直接複製貼上的一句話</b>
-      <div class="line">選一個你最像的情境，直接貼出去：</div>
-      <code id="copyLine"></code>
-    </div>
+    <!-- 解鎖後完整版 -->
+    <div id="full" class="hidden">
+      <div class="pill">✅ 已解鎖完整版（示範）</div>
 
-    <div class="box">
-      <b>4) 止損線（保護你自己）</b>
-      <div class="line" id="stop"></div>
-    </div>
+      <div class="section">
+        <h2>1) 你現在處於哪種局？（快速判斷）</h2>
+        <div class="grid">
+          <div class="box">
+            <div class="boxTitle">A｜對方回很慢，但會回</div>
+            <div class="k">
+              <span class="ok">可能性：</span>忙、社交能量低、或把你放在「後順位」。<br>
+              <span class="warn">風險：</span>你一直追問會變成壓力。
+            </div>
+            <span class="tag">策略：慢慢推</span>
+            <span class="tag">不要連發</span>
+          </div>
 
-    <a class="btn" href="#" onclick="alertPay(); return false;">💳 付 29 元解鎖「更準＋更完整」版本</a>
-    <a class="btn2" href="./index.html">← 回免費首頁</a>
+          <div class="box">
+            <div class="boxTitle">B｜對方很少主動，但互動不排斥</div>
+            <div class="k">
+              <span class="ok">可能性：</span>對方被動、習慣被帶節奏。<br>
+              <span class="warn">風險：</span>你會覺得「都我在主動」而內耗。
+            </div>
+            <span class="tag">策略：用邀約測意願</span>
+            <span class="tag">別做情緒勒索</span>
+          </div>
 
-    <div class="small">
-      目前是「升級內容示範版」：你要真的收錢時，把上面按鈕改成你的收款連結（轉帳/Line Pay/收款平台都行）。
-      <br/>如果你想我幫你設「付費後顯示完整內容」的版本，我可以用最簡單的方式做到。
+          <div class="box">
+            <div class="boxTitle">C｜對方回得敷衍、常消失、沒延伸</div>
+            <div class="k">
+              <span class="warn">可能性：</span>興趣低或備胎區。<br>
+              <span class="ok">策略：</span>縮短訊息、提高價值、用一次邀約做分水嶺。
+            </div>
+            <span class="tag">策略：一次就好</span>
+            <span class="tag">不再追著問</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>2) 你下一步要做什麼？（最少內耗版本）</h2>
+        <div class="k">
+          你只做一個動作：<span class="ok">用「不壓迫的邀約」測一次</span>。<br>
+          看對方是否願意把時間給你。這比你每天聊天有效 10 倍。
+        </div>
+        <div class="hr"></div>
+        <div class="k"><b>邀約模板（直接複製貼上）：</b></div>
+        <div class="box">
+          <div class="k">這週你哪天比較有空？我想請你喝個飲料 / 吃個小東西～</div>
+        </div>
+        <div class="mini">
+          如果對方 <b>願意給日期</b> 或 <b>反問你時間</b>：溫度上升。<br>
+          如果一直「嗯嗯」「再看看」但不給時間：先把投入降下來。
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>3) 對方回很慢，你要怎麼收尾？（不丟臉又有框架）</h2>
+        <div class="k">
+          你要做的不是抱怨，而是把球放回去。<br>
+          這句話可以用在「對方慢回 / 沒主動」的情況：
+        </div>
+        <div class="box">
+          <div class="k">你先忙～有空再回我就好，我晚點再看～</div>
+        </div>
+        <div class="mini">
+          這句的重點：<b>不黏</b>、<b>不逼</b>、<b>你有自己的節奏</b>。
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>4) 3 天規則（保護自尊）</h2>
+        <div class="k">
+          你給一次邀約、一次收尾。<br>
+          <span class="warn">3 天內如果對方都沒有把互動推進（給時間/延伸/主動），</span><br>
+          代表你不用再加碼投入。先把注意力放回自己。
+        </div>
+      </div>
+
+      <a href="./index.html"><button class="btn2">← 回免費首頁</button></a>
+      <button class="btn2" onclick="lockBack()">重新鎖回（測試用）</button>
+
+      <div class="mini">
+        你之後真的要收費時：把「解鎖按鈕」改成你的收款連結；或接金流再做真正解鎖。<br>
+        但現在先用這版測：有沒有人願意點、有沒有人想看完整版。
+      </div>
     </div>
   </div>
 
-<script>
-  // 這版先不靠 query 參數，直接給你一套「通用升級內容」
-  // 你之後若要依「冷/普通/曖昧/很熱」顯示不同內容，再跟我說，我會幫你改成動態版。
-  const badge = document.getElementById("badge");
-  const core = document.getElementById("core");
-  const plan = document.getElementById("plan");
-  const copyLine = document.getElementById("copyLine");
-  const stop = document.getElementById("stop");
-
-  // 這裡用「最常見、最實用」的框架：投入不對等 / 節奏錯位 / 缺少落地
-  badge.textContent = "升級分析：讓你少猜、直接做";
-
-  core.innerHTML =
-    "你現在的痛點通常不是『她喜不喜歡』，而是<strong>投入不對等</strong>：你一直主動、一直想確認；對方回很慢或很少，讓你陷入反覆猜。<br>" +
-    "真正要解的是：<strong>節奏</strong>（你是不是追太緊）＋<strong>落地</strong>（有沒有把關係往現實推進）。";
-
-  plan.innerHTML =
-    "<strong>接下來 24 小時：</strong><br>" +
-    "① 先停連發：不要連續追問、不要用長段落解釋自己。<br>" +
-    "② 只用一個輕量訊息測她會不會接球。<br>" +
-    "③ 她接球 → 給一個『可落地的邀約』；她不接 → 你就收手，不再消耗。";
-
-  copyLine.textContent =
-`（輕量測試）
-欸我剛想到你上次說的那個😂 你現在方便回嗎？
-
-（不壓迫的邀約）
-這週你哪天比較有空？我想請你喝個飲料/吃個小東西～
-
-（對方回很慢的收尾）
-沒事你忙～有空再回就好🙂`;
-
-  stop.innerHTML =
-    "<strong>止損線很簡單：</strong><br>" +
-    "你連續 2 次丟球，她都沒有接（只回『嗯/好/喔』或隔很久敷衍），就停止主動 3 天。<br>" +
-    "如果 3 天內她完全沒動作，代表你不用再投入（至少先轉移注意力，保護自尊）。";
-
-  function alertPay(){
-    alert("示範版：這裡之後改成你的收款連結（例如 Line Pay / 轉帳頁）。\n\n你要我幫你接『付費後顯示完整版』嗎？");
-  }
-  window.alertPay = alertPay;
-</script>
+  <script>
+    function unlockNow(){
+      document.getElementById('locked').style.display='none';
+      document.getElementById('full').style.display='block';
+      try { window.scrollTo({top:0, behavior:'smooth'}); } catch(e) { window.scrollTo(0,0); }
+    }
+    function lockBack(){
+      document.getElementById('full').style.display='none';
+      document.getElementById('locked').style.display='block';
+      try { window.scrollTo({top:0, behavior:'smooth'}); } catch(e) { window.scrollTo(0,0); }
+    }
+  </script>
 </body>
 </html>
